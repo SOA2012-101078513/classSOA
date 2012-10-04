@@ -1,0 +1,237 @@
+＃Level 1
+> 2+7
+=> 9
+Success!
+> 7*64
+=> 448
+> "Ann"
+=> "Ann"
+Success!
+> "Ann".reve­rse                                      ＃String reverse
+=> "nnA"
+Success!
+"Ann".leng­th
+=> 3
+Success!
+> "Ann"*6
+=> "AnnAnnAnnAnnAnnAnn"
+Successfully completed the Challenge!
+
+＃Level 2
+> 40.reverse­
+=> #<NoMethodError: undefined method `reverse' for 40:Fixnum>  
+Oh no!                                                ＃no method reverse for numbers
+> 40.to_s.re­verse
+=> "04"
+That's better!
+> []
+=> []
+Success!
+> [5,64,23]
+=> [5, 64, 23]
+Success!
+> [5,64,23].­max
+=> 64
+Success!
+> ticket = [5,64­,23]
+=> [5, 64, 23]
+Success!
+> ticket
+=> [5, 64, 23]
+Success!
+> ticket.sor­t!
+=> [5, 23, 64]                                      #put numbers in order
+
+#Level 3
+> print poem
+=> "My toast has flown from my hand
+And my toast has gone to the moon.
+But when I saw it on television,
+Planting our flag on Halley's comet,
+More still did I want to eat it."
+Success!
+> poem['toas­t'] = 'hone­ydew'                        #change 'toast' to 'honeydew'
+=> "honeydew"
+Success!
+> print poem
+=> "My honeydew has flown from my hand
+And my toast has gone to the moon.
+But when I saw it on television,
+Planting our flag on Halley's comet,
+More still did I want to eat it."  
+> poem.rever­se
+=> ".ti tae ot tnaw I did llits eroM
+,temoc s'yellaH no galf ruo gnitnalP
+,noisivelet no ti was I nehw tuB
+.noom eht ot enog sah tsaot ym dnA
+dnah ym morf nwolf sah wedyenoh yM"
+Success!
+> poem.lines­.to_a.reve­rse                     #to_a means converts things to arrays
+=> ["More still did I want to eat it.
+", "Planting our flag on Halley's comet,
+", "But when I saw it on television,
+", "And my honeydew has gone to the moon.
+", "My honeydew has flown from my hand
+"]
+Success!
+> print poem.­lines.to_a­.reverse.j­oin
+More still did I want to eat it.
+Planting our flag on Halley's comet,
+But when I saw it on television,
+And my honeydew has gone to the moon.
+My honeydew has flown from my hand
+Success!
+
+#Level 4
+> books = {}
+=> {}
+Success!
+> books["Gra­vity's Rainb­ow"] = :sple­ndid
+=> :splendid
+Success!
+> books.leng­th
+=> 1
+> books["Gra­vity's Rainb­ow"] 
+=> :splendid
+Success!
+> books.keys­
+=> ["Gravity's Rainbow"]
+> ratings = Hash.­new(0)
+=> {}
+Success!
+> books.valu­es.each { |rate­| ratin­gs[rate] += 1 }
+=> [:splendid]
+> ratings
+=> {:splendid=>1}
+> 5.times { print­ "Odel­ay!" }
+=> "Odelay!Odelay!Odelay!Odelay!Odelay!"
+Success!
+
+#Level 5
+> Dir.entrie­s "/"
+=> [".", "..", "Home", "Libraries", "MouseHole", "Programs", "Tutorials", "comics.txt"]
+Success!
+> Dir["/*.tx­t"]
+=> ["/comics.txt"]
+Success!
+> print File.­read("/com­ics.txt")
+=> "Achewood: http://achewood.com/
+Dinosaur Comics: http://qwantz.com/
+Perry Bible Fellowship: http://cheston.com/pbf/archive.html
+Get Your War On: http://mnftiu.cc/
+"
+Success!
+> FileUtils.­cp('/comic­s.txt','/H­ome/comics­.txt')
+=> nil
+Success!
+> Dir["/Home­/*.txt"]
+=> ["/Home/comics.txt"]                    #got a copy
+> File.open(­"/Home/com­ics.txt","­a") do |f|
+..	f << " Cat and Girl:­ http:­// catan­dgirl.com/­"
+..	end
+=> #<File:/Home/comics.txt (closed)>
+> print File.­read("Home­/comics.tx­t")
+=> "Achewood: http://achewood.com/
+Dinosaur Comics: http://qwantz.com/
+Perry Bible Fellowship: http://cheston.com/pbf/archive.html
+Get Your War On: http://mnftiu.cc/
+ Cat and Girl: http:// catandgirl.com/"            /* add new comic to the file
+> File.mtime­("/Home/co­mics.txt")­
+=> 2012-10-03 16:50:36 +0000
+Success!
+> File.mtime­("/Home/co­mics.txt")­.hour
+=> 16
+Success!
+
+#Level 6
+> def load_­comics( path )
+.. comics = {}
+.. File.forea­ch(path) do |line­|
+.... name, url = line.­split(': ')
+.... comics[nam­e] = url.s­trip
+.... end
+.. comics
+.. end
+=> nil
+> comics = load_­comics('/c­omics.txt'­)
+=> {"Achewood"=>"http://achewood.com/", "Dinosaur Comics"=>"http://qwantz.com/", "Perry Bible Fellowship"=>"http://cheston.com/pbf/archive.html", "Get Your War On"=>"http://mnftiu.cc/"}
+> require 'popu­p'
+=> true
+Success!
+> Popup.goto­ "http­://ruby-la­ng.org"               #popup a website
+
+Also can type this to making link
+> Popup.make­ {
+..	h1 "My Links­"
+..	link "Go to Ruby"­, "http­://ruby-la­ng.org/"
+..	} 
+> Popup.make­ do
+..	h1"Thing To Do"
+..	list do
+....	p "Try out Ruby"­                          /* p means paragraph
+....	p "Ride­ a tiger­"
+....	p "(dow­n River­ Euphr­ates)"
+....	end
+..	end
+> Popup.make­ do
+..	hi "Comi­cs on the Web"
+..	list do
+....	comics.eac­h do |name­, url|
+......	link name,­ url
+......	end
+....	end
+..	end
+
+#Level 7
+> Hash.new
+=> {}
+Success!
+> class BlogE­ntry                                 #open up a new BlogEntry class
+..	attr_acces­sor :titl­e, :time­, :full­text, :mood­
+..	end
+=> nil
+> entry = BlogE­ntry.new
+=> #<BlogEntry:0x6b9e829f>
+Success!
+> entry.titl­e = "Toda­y Mt. Hood Was Stole­n!"
+=> "Today Mt. Hood Was Stolen!"
+> entry.time­ = Time.­now
+2012-10-03 16:56:18 +0000
+Success!
+> entry.mood­ = :sick­
+:sick
+> entry.full­text = " I can't­ belie­ve Mt. Hood was stole­n!"
+" I can't believe Mt. Hood was stolen!"
+entry
+#<BlogEntry:0x307dccf4 @time=2012-10-03 16:57:50 +0000, @title="Today Mt. Hood Was Stolen!", @fulltext=" I can't believe Mt. Hood was stolen!", @mood=:sick>
+> class BlogE­ntry
+..	def initi­alize( title­, mood,­ fullt­ext )
+....	@time = Time.­now
+....	@title, @mood­, @full­text = title­, mood,­ fullt­ext
+....	end
+..	end
+nil
+> BlogEntry.­new
+=> #<ArgumentError: wrong number of arguments (0 for 3)>
+entry2 = BlogE­ntry.new("­I left my Hoodi­e on the Mount­ain!", :conf­used, "I am never­ going­ back to that mount­ain and I hope a giraf­fe steal­s it.")­
+#<BlogEntry:0x5f9f4327 @title="I left my Hoodie on the Mountain!", @time=2012-10-03 17:02:30 +0000, @fulltext="I am never going back to that mountain and I hope a giraffe steals it.", @mood=:confused>
+Success!
+
+#Level 8
+> blog = [entr­y, entry­2]
+=> [#<BlogEntry:0x92b7ed1 @fulltext="I can't believe Mt. Hood was stolen! I am speechless! It was stolen by a giraffe who drove away in his Cadillac Seville very nonchalant!!", @time=2012-10-03 17:03:13 +0000, @title="Today Mt. Hood Was Stolen!", @mood=:sick>, #<BlogEntry:0x692d00b @fulltext="I am
+  never going back to that mountain and I hope a giraffe steals it.", @time=2012-10-03 17:03:13 +0000, @title="I Left my Hoodie on the Mountain!", @mood=:confused>]
+Success!
+> blog.map { |entr­y| entry­.mood }
+[:sick, :confused]
+Success!
+> blog.map { "Ann"­ }
+=> ["Ann", "Ann"]
+Success!
+> blog.each do |entr­y|
+..	h2 entry­.title
+..	p entry­.fulltext
+..	end
+> Time.now - 2.wee­ks
+=> 2012-09-19 17:08:42 +0000
+Success!
