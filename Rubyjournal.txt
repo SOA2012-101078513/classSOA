@@ -1,0 +1,268 @@
+- in the command line run
+saasbook@saasbook:~/Documents$ rails new myrottenpotatoes -T
+
+- edit myrottenpotatoes/Gemfile and add:
+  
+1.	# use Haml for templates
+2.	gem 'haml'
+3.	# use Ruby debugger
+4.	group :development, :test do
+5.	  gem 'ruby-debug19'
+6.	end
+
+-in the command line, run: saasbook@saasbook:~/Documents/myrottenpotatoes$ bundle install --without production
+
+- edit myrottenpotatoes/config/routes.rb to:
+1.	Myrottenpotatoes::Application.routes.draw do
+2.	  resources :movies
+3.	  root :to => redirect('/movies')
+4.	end
+
+- (DB and migrations) in the command line, run:  saasbook@saasbook:~/Documents/myrottenpotatoes$ rails generate migration create_movies
+ this will generate: db/migrate/'datetime'_create_movies.rb
+
+- Edit Documents/myrottenpotatoes/db/migrate/'datetime'_create_movies.rb to:
+1.	class CreateMovies < ActiveRecord::Migration
+2.	  def up
+3.	    create_table 'movies' do |t|
+4.	      t.string 'title'
+5.	      t.string 'rating'
+6.	      t.text 'description'
+7.	      t.datetime 'release_date'
+8.	      # Add fields that let Rails automatically keep track
+9.	      # of when movies are added or modified:
+10.	      t.timestamps
+11.	    end
+12.	  end
+13.	 
+14.	  def down
+15.	    drop_table 'movies' # deletes the whole table and all its data!
+16.	  end
+17.	end
+
+
+-in the command line, run:saasbook@saasbook:~/Documents/myrottenpotatoes$ rake db:migrate
+then check db/schema.rb to verify it changed
+     
+- create Documents/myrottenpotatoes/app/models/movie.rb
+1.	class Movie < ActiveRecord::Base
+2.	end
+
+- test ActiveRecords features in rails console
+1.	####  Create
+2.	starwars = Movie.create!(:title => 'Star Wars',
+3.	  :release_date => '25/4/1977', :rating => 'PG')
+4.	# note that numerical dates follow European format: dd/mm/yyyy
+5.	requiem =  Movie.create!(:title => 'Requiem for a Dream',
+6.	  :release_date => 'Oct 27, 2000', :rating => 'R')
+7.	#  Creation using separate 'save' method, used when updating existing records
+8.	field = Movie.new(:title => 'Field of Dreams',
+9.	  :release_date => '21-Apr-89', :rating => 'PG')
+10.	field.save!
+11.	field.title = 'New Field of Dreams'
+12.	####  Read
+13.	pg_movies = Movie.where("rating = 'PG'")
+14.	ancient_movies = Movie.where('release_date < :cutoff and rating = :rating',
+15.	  :cutoff => 'Jan 1, 2000', :rating => 'PG')
+16.	pg_movies_2 = Movie.find_by_rating('PG')
+17.	Movie.find(3)  # exception if key not found; find_by_id returns nil instead
+18.	####  Update
+19.	starwars.update_attributes(:description => 'The best space western EVER',
+20.	  :release_date => '25/5/1977')
+21.	requiem.rating = 'NC-17'
+22.	requiem.save!
+23.	####  Delete
+24.	requiem.destroy
+25.	Movie.where('title = "Requiem for a Dream"')
+26.	####  Find returns an enumerable
+27.	Movie.find_all_by_rating('PG').each do |mov|
+28.	  mov.destroy
+29.	end
+
+- Seed DB (paste on rails console): 
+1.	# Seed the RottenPotatoes DB with some movies.
+2.	more_movies = [
+3.	  {:title => 'Aladdin', :rating => 'G',
+4.	    :release_date => '25-Nov-1992'},
+5.	  {:title => 'When Harry Met Sally', :rating => 'R',
+6.	    :release_date => '21-Jul-1989'},
+7.	  {:title => 'The Help', :rating => 'PG-13',
+8.	    :release_date => '10-Aug-2011'},
+9.	  {:title => 'Raiders of the Lost Ark', :rating => 'PG',
+10.	    :release_date => '12-Jun-1981'}
+11.	]
+12.	# NOTE: the following line temporarily allows mass assignment
+13.	# (needed if you used attr_accessible/attr_protected in movie.rb)
+14.	Movie.send(:attr_accessible, :title, :rating, :release_date)
+15.	more_movies.each do |movie|
+16.	  Movie.create!(movie)
+17.	end
+
+- create app/controller/movies_controller.rb
+1.	# This file is app/controllers/movies_controller.rb
+2.	class MoviesController < ApplicationController
+3.	  def index
+4.	    @movies = Movie.all
+5.	  end
+6.	end
+
+- create app/views/movies/index.html.haml
+1.	-#  This file is app/views/movies/index.html.haml
+2.	%h2 All Movies
+3.	 
+4.	%table#movies
+5.	  %thead
+6.	    %tr
+7.	      %th Movie Title
+8.	      %th Rating
+9.	      %th Release Date
+10.	      %th More Info
+11.	  %tbody
+12.	    - @movies.each do |movie|
+13.	      %tr
+14.	        %td= movie.title
+15.	        %td= movie.rating
+16.	        %td= movie.release_date
+17.	        %td= link_to "More about #{movie.title}", movie_path(movie)
+
+- test web app. in your browser goto: http://localhost:3000/movies
+
+- replace app/views/layout/application.html.erb with "application.html.haml"
+1.	!!! 5
+2.	%html
+3.	  %head
+4.	    %title Rotten Potatoes!
+5.	    = stylesheet_link_tag 'application'
+6.	    = javascript_include_tag 'application'
+7.	    = csrf_meta_tags
+8.	 
+9.	  %body
+10.	    = yield
+
+- add show method in movies controller (app/controllers/movies_controller.rb)
+1.	# in app/controllers/movies_controller.rb
+2.	 
+3.	def show
+4.	  id = params[:id] # retrieve movie ID from URI route
+5.	  @movie = Movie.find(id) # look up movie by unique ID
+6.	  # will render app/views/movies/show.html.haml by default
+7.	end
+
+- add new view template (app/views/movies/show.html.haml
+1.	-# in app/views/movies/show.html.haml
+2.	 
+3.	%h2 Details about #{@movie.title}
+4.	 
+5.	%ul#details
+6.	  %li
+7.	    Rating:
+8.	    = @movie.rating
+9.	  %li
+10.	    Released on:
+11.	    = @movie.release_date.strftime("%B %d, %Y")
+12.	 
+13.	%h3 Description:
+14.	 
+15.	%p#description= @movie.description
+16.	 
+17.	= link_to 'Back to movie list', movies_path
+
+
+
+- test web app. in browser goto: http://localhost:3000/movies then click a movie link, you should be redirected to http://localhost:3000/movies/[movied_id] with rendered movie details
+
+- (styling): edit Documents/myrottenpotatoes/app/assets/stylesheets/application.css
+1.	/* Simple CSS styling for RottenPotatoes app */
+2.	/* Add these lines to app/assets/stylesheets/application.css */
+3.	 
+4.	html, body {
+5.	  margin: 0;
+6.	  padding: 0;
+7.	  background: White;
+8.	  color: DarkSlateGrey;
+9.	  font-family: Tahoma, Verdana, sans-serif;
+10.	  font-size: 10pt;
+11.	}
+12.	div#main {
+13.	  margin: 0;
+14.	  padding: 0 20px 20px;
+15.	}
+16.	a {
+17.	  background: transparent;
+18.	  color: maroon;
+19.	  text-decoration: underline;
+20.	  font-weight: bold;
+21.	}
+22.	h1 {
+23.	  color: maroon;
+24.	  font-size: 150%;
+25.	  font-style: italic;
+26.	  display: block;
+27.	  width: 100%;
+28.	  border-bottom: 1px solid DarkSlateGrey;
+29.	}
+30.	h1.title {
+31.	  margin: 0 0 1em;
+32.	  padding: 10px;
+33.	  background-color: orange;
+34.	  color: white;
+35.	  border-bottom: 4px solid gold;
+36.	  font-size: 2em;
+37.	  font-style: normal;
+38.	}
+39.	table#movies {
+40.	  margin: 10px;
+41.	  border-collapse: collapse;
+42.	  width: 100%;
+43.	  border-bottom: 2px solid black;
+44.	}
+45.	table#movies th {
+46.	  border: 2px solid white;
+47.	  font-weight: bold;
+48.	  background-color: wheat;
+49.	}
+50.	table#movies th, table#movies td {
+51.	  padding: 4px;
+52.	  text-align: left;
+53.	}
+54.	#notice, #warning {
+55.	  background: rosybrown;
+56.	  margin: 1em 0;
+57.	  padding: 4px;
+58.	}
+59.	form label {
+60.	  display: block;
+61.	  line-height: 25px;
+62.	  font-weight: bold;
+63.	  color: maroon;
+64.	}
+
+- test web app. in your browser goto: http://localhost:3000/movies - your page should now be styled
+
+- (Allow users to add new movies): edit app/views/movies/index.html.haml - add this line at the end of the file
+1.	-# add to end of index.html.haml
+2.	 
+3.	= link_to 'Add new movie', new_movie_path
+
+- edit app/controllers/movies_controller.rb
+1.	def new
+2.	  # default: render 'new' template
+3.	end
+
+- create app/views/movies/new.html.haml
+1.	%h2 Create New Movie
+2.	 
+3.	= form_tag movies_path, :method => :post do
+4.	 
+5.	  = label :movie, :title, 'Title'
+6.	  = text_field :movie, :title
+7.	 
+8.	  = label :movie, :rating, 'Rating'
+9.	  = select :movie, :rating, ['G','PG','PG-13','R','NC-17']
+10.	 
+11.	  = label :movie, :release_date, 'Released On'
+12.	  = date_select :movie, :release_date
+13.	 
+14.	  = submit_tag 'Save Changes'
+- test web app. in your browser goto: http://localhost:3000/movies - then click 'Add new Movie' you should redirected to the new movie page
+
