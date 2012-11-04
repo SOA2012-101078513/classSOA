@@ -264,5 +264,78 @@ then check db/schema.rb to verify it changed
 12.	  = date_select :movie, :release_date
 13.	 
 14.	  = submit_tag 'Save Changes'
+
+
 - test web app. in your browser goto: http://localhost:3000/movies - then click 'Add new Movie' you should redirected to the new movie page
 
+
+- 'create' action:edit app/controllers/movies_controller.rb
+# in movies_controller.rb
+def create
+  @movie = Movie.create!(params[:movie])
+  flash[:notice] = "#{@movie.title} was successfully created."
+  redirect_to movies_path
+end
+
+
+- add this line inside the body tag of app/views/layout/application.html.haml
+-# this goes just inside %body:
+- if flash[:notice]
+  #notice.message= flash[:notice]
+- elsif flash[:warning]
+  #warning.message= flash[:warning]
+
+- test web app. in your browser goto: http://localhost:3000/movies - then click 'Add new Movie' you should redirected to the new movie page, type a new movie then click save changes. you should your new movie listed on the main page
+
+
+- (Update and Delete a movie) add this two lines in app/views/movies/show.html.haml
+-# Our Edit link from previous example:
+= link_to 'Edit info', edit_movie_path(@movie)
+-# This Delete link will not really be a link, but a form:
+= link_to 'Delete', movie_path(@movie), :method => :delete
+= link_to 'Back to movie list', movies_path
+
+
+- modify app/controllers/movies_controller.rb and add the 'edit', 'update' and 'delete' methods
+# in movies_controller.rb
+ 
+def edit
+  @movie = Movie.find params[:id]
+end
+ 
+def update
+  @movie = Movie.find params[:id]
+  @movie.update_attributes!(params[:movie])
+  flash[:notice] = "#{@movie.title} was successfully updated."
+  redirect_to movie_path(@movie)
+end
+ 
+def destroy
+  @movie = Movie.find(params[:id])
+  @movie.destroy
+  flash[:notice] = "Movie '#{@movie.title}' deleted."
+  redirect_to movies_path
+end
+
+
+
+- create app/views/movies/edit.haml.html
+%h2 Edit Movie
+ 
+= form_tag movie_path(@movie), :method => :put do
+ 
+  = label :movie, :title, 'Title'
+  = text_field :movie, 'title'
+ 
+  = label :movie, :rating, 'Rating'
+  = select :movie, :rating, ['G','PG','PG-13','R','NC-17']
+ 
+  = label :movie, :release_date, 'Released On'
+  = date_select :movie, :release_date
+ 
+  = submit_tag 'Save Changes'
+
+
+
+
+- test web app. in your browser goto: http://localhost:3000/movies, try to edit and delete a movie
