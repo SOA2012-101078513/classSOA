@@ -1,0 +1,105 @@
+
+$ rails generate cucumber:install capybara
+   identical  config/cucumber.yml
+   identical  script/cucumber
+       chmod  script/cucumber
+       exist  features/step_definitions
+       exist  features/support
+   identical  features/support/env.rb
+       exist  lib/tasks
+   identical  lib/tasks/cucumber.rake
+$ rails generate cucumber_rails_training_wheels:install
+       exist  features/step_definitions
+   identical  features/step_definitions/web_steps.rb
+       exist  features/support
+   identical  features/support/paths.rb
+   identical  features/support/selectors.rb
+
+$ rake db:test:prepare
+
+-create AddMovie.feature in Features folder
+Feature: User can manually add movie
+
+Scenario: Add a movie
+ Given I am on the RottenPotatoes home page
+ When I follow "Add new movie"
+ Then I should be on the Create New Movie page
+ When I fill in "Title" with "Men In Black"
+ And I select "PG-13" from "Rating"
+ And I press "Save Changes"
+ Then I should be on the RottenPotatoes home page 
+ And I should see "Men In Black"
+
+$ bundle exec cucumber features/AddMovie.feature 
+
+-modify ~/features/support/paths.rb  until no red line in cucumber
+
+-create search_tmdb.features in features
+Feature: User can add movie by searching for it in The Movie Database (TMDb)
+
+  As a movie fan
+  So that I can add new movies without manual tedium
+  I want to add movies by looking up their details in TMDb
+
+Scenario: Try to add nonexistent movie (sad path)
+
+  Given I am on the RottenPotatoes home page
+  Then I should see "Search TMDb for a movie"
+  When I fill in "Search Terms" with "Movie That Does Not Exist"
+  And I press "Search TMDb"
+  Then I should be on the RottenPotatoes home page
+  And I should see "'Movie That Does Not Exist' was not found in TMDb."
+
+-add to end of app/views/movies/index.html.haml
+%h1 Search TMDb for a movie
+= form_tag :action => 'search_tmdb' do
+     
+  %label{:for => 'search_terms'} Search Terms
+  = text_field_tag 'search_terms'
+  = submit_tag 'Search TMDb'
+
+-add in movies_controller.rb
+  def search_tmdb
+    # hardwire to simulate failure
+    flash[:warning] = "'#{params[:search_terms]}' was not found in TMDb."
+    redirect_to movies_path
+  end
+
+-add to routes.rb
+# Route that posts 'Search TMDb' form
+post '/movies/search_tmdb'
+
+-add to search_tmdb.feature
+Feature: User can add movie by searching for it in The Movie Database (TMDb)
+
+  As a movie fan
+  So that I can add new movies without manual tedium
+  I want to add movies by looking up their details in TMDb
+
+Background: Start from the Search form on the home page
+
+  Given I am on the RottenPotatoes home page
+  Then I should see "Search TMDb for a movie"
+
+Scenario: Try to add nonexistent movie (sad path)
+
+  When I fill in "Search Terms" with "Movie That Does Not Exist"
+  And I press "Search TMDb"
+  Then I should be on the RottenPotatoes home page
+  And I should see "'Movie That Does Not Exist' was not found in TMDb."
+
+Scenario: Try to add existing movie (happy path)
+
+  When I fill in "Search Terms" with "Inception"
+  And I press "Search TMDb"
+  Then I should be on the "Search Results" page
+  And I should not see "not found"
+  And I should see "Inception"
+
+
+
+
+
+
+
+
