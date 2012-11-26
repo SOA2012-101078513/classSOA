@@ -14,6 +14,11 @@ Myrottenpotatoes::Application.routes.draw do
   #   resources :products
   resources :movies
   root :to => redirect('/movies')
+# add to routes.rb, just before or just after 'resources :movies' :
+
+# Route that posts 'Search TMDb' form
+  post '/movies/search_tmdb'
+
   # Sample resource route with options:
   #   resources :products do
   #     member do
